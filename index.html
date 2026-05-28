@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AirStamp — Ticket Branding</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07090f;
+  --surface: #0e1420;
+  --card: #131d2e;
+  --card2: #192438;
+  --border: rgba(120,140,255,0.13);
+  --border2: rgba(120,140,255,0.28);
+  --accent: #6366f1;
+  --accent2: #4f46e5;
+  --glow: rgba(99,102,241,0.22);
+  --text: #e8edf5;
+  --muted: #7a8ba8;
+  --faint: #2e3a4e;
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --r: 14px; --r2: 10px;
+  --ff: 'DM Sans', sans-serif;
+  --fd: 'Syne', sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--ff);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+body.light {
+  --bg: #f0f4fa;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card2: #f8fafc;
+  --border: rgba(99,102,241,0.14);
+  --border2: rgba(99,102,241,0.35);
+  --text: #0f172a;
+  --muted: #64748b;
+  --faint: #e2e8f0;
+  --glow: rgba(99,102,241,0.12);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
+
+/* ── HEADER ── */
+header {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 68px;
+  background: rgba(7,9,15,0.82);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  transition: background .3s;
+}
+body.light header { background: rgba(240,244,250,0.88); }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 4px 18px rgba(99,102,241,0.38);
+}
+.logo-text { font-family: var(--fd); font-size: 21px; font-weight: 800; color: var(--text); line-height: 1; }
+.logo-text span { color: #6366f1; }
+.logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .07em; margin-top: 2px; }
+.hdr-btns { display: flex; gap: 8px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: var(--r2);
+  font-family: var(--ff); font-size: 14px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--border); background: transparent;
+  color: var(--muted); transition: all .18s; text-decoration: none; white-space: nowrap;
+}
+.btn:hover { border-color: var(--border2); color: var(--text); background: var(--card2); }
+.btn-primary { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 4px 18px var(--glow); }
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 24px var(--glow); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-success { background: var(--success); color: #fff; border-color: transparent; box-shadow: 0 4px 16px rgba(16,185,129,.25); }
+.btn-success:hover { background: #059669; transform: translateY(-1px); }
+.btn-icon { padding: 9px 11px; }
+
+/* ── MAIN ── */
+main { max-width: 1000px; margin: 0 auto; padding: 0 22px 80px; }
+
+/* ── HERO ── */
+.hero { text-align: center; padding: 64px 0 44px; position: relative; }
+.hero-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.25);
+  padding: 5px 15px; border-radius: 30px;
+  font-size: 12px; color: var(--accent); font-weight: 500; letter-spacing: .05em;
+  text-transform: uppercase; margin-bottom: 22px;
+}
+.hero h1 {
+  font-family: var(--fd); font-size: clamp(30px,5vw,52px);
+  font-weight: 800; line-height: 1.08; letter-spacing: -.03em;
+  color: var(--text); margin-bottom: 18px;
+}
+.hero h1 span {
+  background: linear-gradient(130deg, #6366f1, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero p { font-size: 17px; color: var(--muted); line-height: 1.68; max-width: 500px; margin: 0 auto 28px; }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
+.hero-tag {
+  background: var(--card); border: 1px solid var(--border);
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--muted);
+}
+
+/* ── CARD ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 26px; margin-bottom: 24px; }
+.card-title {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--fd); font-size: 17px; font-weight: 700;
+  color: var(--text); margin-bottom: 22px;
+}
+.card-title .ti { width: 34px; height: 34px; border-radius: 9px; background: var(--glow); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 17px; flex-shrink: 0; }
+
+/* ── DROP ZONES ── */
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+@media(max-width:600px) { .upload-grid { grid-template-columns: 1fr; } }
+.drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 32px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .22s;
+  background: rgba(255,255,255,.015);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 170px;
+}
+.drop:hover, .drop.over { border-color: var(--accent); background: rgba(99,102,241,.04); }
+.drop.filled { border-style: solid; border-color: var(--success); background: rgba(16,185,129,.04); }
+.drop-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--glow); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 24px; margin-bottom: 14px; }
+.drop h3 { font-family: var(--fd); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.drop p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.file-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,.12); color: var(--success); border: 1px solid rgba(16,185,129,.22); padding: 5px 13px; border-radius: 25px; font-size: 13px; font-weight: 500; margin-top: 8px; }
+.drop-label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 8px; }
+.remove-btn { position: absolute; top: 9px; right: 9px; background: var(--danger); border: none; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 12px; opacity: 0; transition: opacity .2s; }
+.drop:hover .remove-btn, .remove-btn:focus { opacity: 1; }
+.banner-img-preview { max-width: 100%; max-height: 70px; object-fit: contain; border-radius: 8px; margin-bottom: 9px; }
+
+/* ── OPTIONS ── */
+.tmpl-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 11px; margin-bottom: 4px; }
+.tmpl {
+  border: 2px solid var(--border); border-radius: var(--r2);
+  padding: 13px 10px; cursor: pointer; text-align: center;
+  transition: all .18s; background: var(--card2);
+}
+.tmpl:hover { border-color: var(--border2); }
+.tmpl.sel { border-color: var(--accent); background: rgba(99,102,241,.07); }
+.tmpl-preview { width: 100%; height: 48px; background: var(--faint); border-radius: 6px; margin-bottom: 8px; position: relative; overflow: hidden; border: 1px solid var(--border); }
+.tmpl-bar { position: absolute; top: 0; left: 0; right: 0; background: var(--accent); opacity: .55; }
+.tmpl-lines { position: absolute; left: 7px; right: 7px; bottom: 7px; display: flex; flex-direction: column; gap: 3px; }
+.tmpl-line { height: 3px; background: var(--border2); border-radius: 2px; }
+.tmpl p { font-size: 12px; font-weight: 500; color: var(--muted); }
+.tmpl.sel p { color: var(--accent); font-weight: 600; }
+.form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--muted); min-width: 130px; }
+input[type=range] {
+  flex: 1; height: 4px; -webkit-appearance: none; appearance: none;
+  background: var(--faint); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 3px var(--glow); cursor: pointer;
+}
+.range-val { font-size: 13px; color: var(--accent); font-weight: 600; min-width: 38px; text-align: right; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.toggle-label { font-size: 14px; color: var(--text); font-weight: 500; }
+.toggle-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.toggle { position: relative; width: 42px; height: 23px; cursor: pointer; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.tslider { position: absolute; inset: 0; background: var(--faint); border-radius: 12px; transition: .25s; }
+.tslider::before { content: ''; position: absolute; width: 17px; height: 17px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .25s; }
+.toggle input:checked + .tslider { background: var(--accent); }
+.toggle input:checked + .tslider::before { transform: translateX(19px); }
+.text-input {
+  width: 100%; padding: 9px 13px; background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: var(--r2); color: var(--text); font-family: var(--ff); font-size: 14px; outline: none; transition: border .18s;
+}
+body.light .text-input { background: var(--card2); }
+.text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+
+/* ── ACTION ROW ── */
+.action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.action-row .btn-primary { flex: 1; min-width: 190px; padding: 15px 28px; font-size: 15px; border-radius: 13px; justify-content: center; }
+.hint { font-size: 13px; color: var(--warn); text-align: center; margin-top: -4px; }
+
+/* ── OVERLAY ── */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(7,9,15,.88); backdrop-filter: blur(10px);
+  align-items: center; justify-content: center;
+}
+.overlay.show { display: flex; }
+.ov-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 46px 52px; text-align: center; max-width: 340px; width: 92%; }
+.spinner { width: 58px; height: 58px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 22px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ov-title { font-family: var(--fd); font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.ov-sub { font-size: 14px; color: var(--muted); }
+.prog-bar { margin-top: 22px; height: 3px; background: var(--faint); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #8b5cf6); border-radius: 2px; width: 0; transition: width .4s ease; }
+
+/* ── RESULT ── */
+.result-card { background: var(--card); border: 1px solid rgba(16,185,129,.28); border-radius: var(--r); padding: 26px; margin-bottom: 24px; background: rgba(16,185,129,.03); }
+.result-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.result-title { display: flex; align-items: center; gap: 9px; font-family: var(--fd); font-size: 17px; font-weight: 700; color: var(--text); }
+.result-actions { display: flex; gap: 10px; }
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 11px; margin-bottom: 20px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px; }
+.stat-val { font-family: var(--fd); font-size: 22px; font-weight: 800; color: var(--text); }
+.stat-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.pdf-frame { width: 100%; height: 580px; border: none; border-radius: 10px; background: var(--card2); }
+@media(max-width:600px) { .pdf-frame { height: 400px; } }
+
+/* ── TOAST ── */
+.toasts { position: fixed; top: 78px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 9px; pointer-events: none; }
+.toast {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 13px 18px; font-size: 14px; color: var(--text); max-width: 340px;
+  box-shadow: 0 10px 32px rgba(0,0,0,.35);
+  animation: toast-in .25s ease; pointer-events: all;
+  display: flex; align-items: center; gap: 9px;
+}
+.toast.ok .toast-dot { background: var(--success); }
+.toast.err .toast-dot { background: var(--danger); }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--accent); }
+@keyframes toast-in { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+@keyframes toast-out { to { opacity:0; transform: translateX(20px); } }
+
+/* ── TIP BOX ── */
+.tip {
+  background: rgba(99,102,241,.06); border: 1px solid rgba(99,102,241,.15);
+  border-radius: 10px; padding: 12px 15px; font-size: 13px; color: var(--muted);
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.tip strong { color: var(--accent); }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border); padding: 28px; text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">✈</div>
+    <div>
+      <div class="logo-text">Air<span>Stamp</span></div>
+      <div class="logo-sub">TICKET BRANDING</div>
+    </div>
+  </div>
+  <div class="hdr-btns">
+    <button class="btn btn-icon" id="modeBtn" title="Toggle dark/light mode">🌙</button>
+  </div>
+</header>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<!-- PROCESSING OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="ov-card">
+    <div class="spinner"></div>
+    <div class="ov-title">Processing PDF</div>
+    <div class="ov-sub" id="ovMsg">Loading your files...</div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+</div>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-pill">✦ Professional Ticket Branding</div>
+    <h1>Brand Your Tickets<br><span>Instantly — No Install</span></h1>
+    <p>Upload any airline PDF ticket, add your agency banner, and download a professionally branded ticket in seconds. Everything runs in your browser.</p>
+    <div class="hero-tags">
+      <span class="hero-tag">✈ Multi-page PDFs</span>
+      <span class="hero-tag">⚡ Instant in browser</span>
+      <span class="hero-tag">🎨 3 banner styles</span>
+      <span class="hero-tag">📱 Works on mobile</span>
+      <span class="hero-tag">🔒 Files never leave device</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="card">
+    <div class="card-title">
+      <div class="ti">📂</div>
+      Upload Files
+    </div>
+    <div class="upload-grid">
+      <!-- PDF Drop -->
+      <div>
+        <div class="drop-label">Step 1 — Ticket PDF</div>
+        <div class="drop" id="pdfDrop" onclick="document.getElementById('pdfInput').click()">
+          <input type="file" id="pdfInput" accept=".pdf,application/pdf" style="display:none" />
+          <div id="pdfEmpty">
+            <div class="drop-icon">📄</div>
+            <h3>Upload Ticket PDF</h3>
+            <p>Drag & drop or click<br>PDF files up to 50 MB</p>
+          </div>
+          <div id="pdfFilled" style="display:none; flex-direction:column; align-items:center;">
+            <div style="font-size:32px; margin-bottom:10px;">✅</div>
+            <div class="file-tag" id="pdfName">ticket.pdf</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:6px" id="pdfSize"></div>
+          </div>
+          <button class="remove-btn" id="pdfRemove" onclick="clearPdf(event)">✕</button>
+        </div>
+      </div>
+      <!-- Banner Drop -->
+      <div>
+        <div class="drop-label">Step 2 — Agency Banner</div>
+        <div class="drop" id="bannerDrop" onclick="document.getElementById('bannerInput').click()">
+          <input type="file" id="bannerInput" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" style="display:none" />
+          <div id="bannerEmpty">
+            <div class="drop-icon" style="background:rgba(139,92,246,.15);color:#8b5cf6;">🖼️</div>
+            <h3>Upload Agency Banner</h3>
+            <p>JPG or PNG logo/letterhead<br>Wide format recommended</p>
+          </div>
+          <div id="bannerFilled" style="display:none; flex-direction:column; align-items:center;">
+            <img id="bannerPreview" class="banner-img-preview" src="" alt="banner" />
+            <div class="file-tag" id="bannerName">banner.png</div>
+          </div>
+          <button class="remove-btn" id="bannerRemove" onclick="clearBanner(event)">✕</button>
+        </div>
+      </div>
+    </div>
+    <div class="tip">
+      <strong>💡 Tip:</strong> Use a wide PNG banner (1200×150px) with a transparent background for best results. The banner will auto-scale to fit the full page width.
+    </div>
+  </div>
+
+  <!-- STEP 2: OPTIONS -->
+  <div class="card">
+    <div class="card-title">
+      <div class="ti">⚙️</div>
+      Banner Options
+    </div>
+
+    <!-- Template -->
+    <div style="margin-bottom:20px;">
+      <div class="drop-label" style="margin-bottom:10px;">Banner Style</div>
+      <div class="tmpl-grid">
+        <div class="tmpl sel" data-tmpl="standard" onclick="selectTmpl(this)">
+          <div class="tmpl-preview">
+            <div class="tmpl-bar" style="height:40%;"></div>
+            <div class="tmpl-lines" style="top:42%"><div class="tmpl-line" style="width:90%"></div><div class="tmpl-line" style="width:70%"></div></div>
+          </div>
+          <p>Standard</p>
+        </div>
+        <div class="tmpl" data-tmpl="fullbleed" onclick="selectTmpl(this)">
+          <div class="tmpl-preview">
+            <div class="tmpl-bar" style="height:44%;background:linear-gradient(90deg,var(--accent),#8b5cf6);"></div>
+            <div class="tmpl-lines" style="top:46%"><div class="tmpl-line" style="width:90%"></div><div class="tmpl-line" style="width:70%"></div></div>
+          </div>
+          <p>Full Bleed</p>
+        </div>
+        <div class="tmpl" data-tmpl="centered" onclick="selectTmpl(this)">
+          <div class="tmpl-preview">
+            <div class="tmpl-bar" style="height:44%;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;">
+              <div style="width:50%;height:60%;background:rgba(99,102,241,.4);border-radius:3px;"></div>
+            </div>
+            <div class="tmpl-lines" style="top:46%"><div class="tmpl-line" style="width:90%"></div><div class="tmpl-line" style="width:70%"></div></div>
+          </div>
+          <p>Centered</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="form-row">
+      <span class="form-label">Banner Height</span>
+      <input type="range" id="heightRange" min="6" max="25" value="12" oninput="document.getElementById('heightVal').textContent=this.value+'%'">
+      <span class="range-val" id="heightVal">12%</span>
+    </div>
+    <div class="form-row" style="margin-bottom:0">
+      <span class="form-label">Page Margin</span>
+      <input type="range" id="marginRange" min="0" max="30" step="2" value="10" oninput="document.getElementById('marginVal').textContent=this.value+'pt'">
+      <span class="range-val" id="marginVal">10pt</span>
+    </div>
+
+    <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
+
+    <!-- Watermark toggle -->
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Add Watermark</div>
+        <div class="toggle-sub">Diagonal text on each page</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="wmToggle" onchange="toggleWm()">
+        <span class="tslider"></span>
+      </label>
+    </div>
+    <div id="wmRow" style="display:none">
+      <input type="text" class="text-input" id="wmText" placeholder="e.g. CONFIDENTIAL, SAMPLE, YOUR AGENCY NAME" maxlength="30" value="CONFIDENTIAL" />
+    </div>
+  </div>
+
+  <!-- STEP 3: PROCESS -->
+  <div class="action-row">
+    <button class="btn btn-primary" id="processBtn" onclick="processPdf()" disabled>
+      ⚡ Brand My Ticket
+    </button>
+    <button class="btn" onclick="resetAll()" style="padding:15px 20px;">
+      ↺ Reset
+    </button>
+  </div>
+  <p class="hint" id="hint">Upload a PDF and banner image to get started</p>
+
+  <!-- RESULT -->
+  <div id="resultSection" style="display:none; margin-top:24px;">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-title">✅ Branded Ticket Ready</div>
+        <div class="result-actions">
+          <button class="btn" onclick="togglePreview()" id="previewToggle">👁 Hide Preview</button>
+          <button class="btn btn-success" id="downloadBtn">⬇ Download PDF</button>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-val" id="statPages">—</div><div class="stat-lbl">Pages branded</div></div>
+        <div class="stat"><div class="stat-val">✓</div><div class="stat-lbl">Complete</div></div>
+        <div class="stat"><div class="stat-val">PDF</div><div class="stat-lbl">Format</div></div>
+      </div>
+      <div id="previewWrap">
+        <iframe id="pdfPreviewFrame" class="pdf-frame" title="Branded PDF Preview"></iframe>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>✈ AirStamp — Everything runs in your browser. Your files never leave your device. ❤️</footer>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let pdfBytes = null, bannerDataUrl = null, selectedTmpl = 'standard', outputBlob = null;
+
+// ─── Dark/Light Mode ─────────────────────────────────────────────────────────
+const modeBtn = document.getElementById('modeBtn');
+let isDark = true;
+modeBtn.onclick = () => {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  modeBtn.textContent = isDark ? '🌙' : '☀️';
+};
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<div class="toast-dot"></div><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'toast-out .25s ease forwards';
+    setTimeout(() => el.remove(), 250);
+  }, 3800);
+}
+
+// ─── Template selector ───────────────────────────────────────────────────────
+function selectTmpl(el) {
+  document.querySelectorAll('.tmpl').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedTmpl = el.dataset.tmpl;
+}
+
+// ─── Watermark toggle ────────────────────────────────────────────────────────
+function toggleWm() {
+  document.getElementById('wmRow').style.display = document.getElementById('wmToggle').checked ? 'block' : 'none';
+}
+
+// ─── File helpers ─────────────────────────────────────────────────────────────
+function fmtSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(2) + ' MB';
+}
+function shortName(n, max=28) { return n.length > max ? n.slice(0, max-2) + '…' : n; }
+function updateProcessBtn() {
+  const ok = pdfBytes && bannerDataUrl;
+  document.getElementById('processBtn').disabled = !ok;
+  document.getElementById('hint').textContent = ok
+    ? '✅ Ready! Click "Brand My Ticket" to process.'
+    : (!pdfBytes && !bannerDataUrl) ? 'Upload a PDF and banner image to get started'
+    : !pdfBytes ? '⚠️ Please upload a PDF ticket'
+    : '⚠️ Please upload a banner image';
+  document.getElementById('hint').style.color = ok ? 'var(--success)' : '';
+}
+
+// ─── PDF Drop ────────────────────────────────────────────────────────────────
+const pdfInput = document.getElementById('pdfInput');
+const pdfDrop  = document.getElementById('pdfDrop');
+
+pdfInput.onchange = e => loadPdf(e.target.files[0]);
+pdfDrop.ondragover = e => { e.preventDefault(); pdfDrop.classList.add('over'); };
+pdfDrop.ondragleave = () => pdfDrop.classList.remove('over');
+pdfDrop.ondrop = e => {
+  e.preventDefault(); pdfDrop.classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type === 'application/pdf') loadPdf(f);
+  else toast('Please drop a PDF file.', 'err');
+};
+
+function loadPdf(file) {
+  if (!file) return;
+  if (file.type !== 'application/pdf') { toast('Only PDF files allowed.', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pdfBytes = new Uint8Array(ev.target.result);
+    document.getElementById('pdfEmpty').style.display = 'none';
+    const f = document.getElementById('pdfFilled');
+    f.style.display = 'flex';
+    document.getElementById('pdfName').textContent = shortName(file.name);
+    document.getElementById('pdfSize').textContent = fmtSize(file.size);
+    pdfDrop.classList.add('filled');
+    toast('PDF loaded: ' + shortName(file.name, 22));
+    updateProcessBtn();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function clearPdf(e) {
+  e.stopPropagation();
+  pdfBytes = null;
+  pdfInput.value = '';
+  document.getElementById('pdfEmpty').style.display = '';
+  document.getElementById('pdfFilled').style.display = 'none';
+  pdfDrop.classList.remove('filled');
+  updateProcessBtn();
+}
+
+// ─── Banner Drop ──────────────────────────────────────────────────────────────
+const bannerInput  = document.getElementById('bannerInput');
+const bannerDrop   = document.getElementById('bannerDrop');
+
+bannerInput.onchange = e => loadBanner(e.target.files[0]);
+bannerDrop.ondragover = e => { e.preventDefault(); bannerDrop.classList.add('over'); };
+bannerDrop.ondragleave = () => bannerDrop.classList.remove('over');
+bannerDrop.ondrop = e => {
+  e.preventDefault(); bannerDrop.classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadBanner(f);
+  else toast('Please drop a JPG or PNG image.', 'err');
+};
+
+function loadBanner(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('Only JPG/PNG images allowed.', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    bannerDataUrl = ev.target.result;
+    document.getElementById('bannerEmpty').style.display = 'none';
+    const f = document.getElementById('bannerFilled');
+    f.style.display = 'flex';
+    document.getElementById('bannerPreview').src = bannerDataUrl;
+    document.getElementById('bannerName').textContent = shortName(file.name);
+    bannerDrop.classList.add('filled');
+    toast('Banner loaded: ' + shortName(file.name, 22));
+    updateProcessBtn();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearBanner(e) {
+  e.stopPropagation();
+  bannerDataUrl = null;
+  bannerInput.value = '';
+  document.getElementById('bannerEmpty').style.display = '';
+  document.getElementById('bannerFilled').style.display = 'none';
+  bannerDrop.classList.remove('filled');
+  updateProcessBtn();
+}
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+function resetAll() {
+  clearPdf({ stopPropagation: () => {} });
+  clearBanner({ stopPropagation: () => {} });
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('heightRange').value = 12;
+  document.getElementById('heightVal').textContent = '12%';
+  document.getElementById('marginRange').value = 10;
+  document.getElementById('marginVal').textContent = '10pt';
+  document.getElementById('wmToggle').checked = false;
+  document.getElementById('wmRow').style.display = 'none';
+  outputBlob = null;
+  toast('Reset complete.');
+}
+
+// ─── Preview toggle ───────────────────────────────────────────────────────────
+function togglePreview() {
+  const wrap = document.getElementById('previewWrap');
+  const btn  = document.getElementById('previewToggle');
+  const hidden = wrap.style.display === 'none';
+  wrap.style.display = hidden ? '' : 'none';
+  btn.textContent = hidden ? '👁 Hide Preview' : '👁 Show Preview';
+}
+
+// ─── Progress helper ──────────────────────────────────────────────────────────
+let progVal = 0;
+function setProgress(pct, msg) {
+  progVal = pct;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('ovMsg').textContent = msg;
+}
+
+// ─── MAIN PROCESS FUNCTION ────────────────────────────────────────────────────
+async function processPdf() {
+  if (!pdfBytes || !bannerDataUrl) return;
+
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('show');
+  setProgress(10, 'Loading your PDF…');
+
+  try {
+    const { PDFDocument, rgb } = PDFLib;
+
+    setProgress(20, 'Parsing PDF pages…');
+    const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+    const pages = pdfDoc.getPages();
+    if (pages.length === 0) throw new Error('PDF has no pages.');
+
+    setProgress(35, 'Embedding your banner…');
+
+    // Convert data URL to Uint8Array
+    const base64 = bannerDataUrl.split(',')[1];
+    const binaryStr = atob(base64);
+    const imgBytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) imgBytes[i] = binaryStr.charCodeAt(i);
+
+    // Embed as PNG (we re-draw with canvas to ensure PNG format)
+    let embeddedImg;
+    try {
+      if (bannerDataUrl.startsWith('data:image/png')) {
+        embeddedImg = await pdfDoc.embedPng(imgBytes);
+      } else {
+        // Convert to PNG via canvas for JPEG/WEBP
+        const canvas = document.createElement('canvas');
+        const imgEl = new Image();
+        await new Promise(res => { imgEl.onload = res; imgEl.src = bannerDataUrl; });
+        canvas.width = imgEl.width; canvas.height = imgEl.height;
+        canvas.getContext('2d').drawImage(imgEl, 0, 0);
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const pngBase64 = pngDataUrl.split(',')[1];
+        const pngBin = atob(pngBase64);
+        const pngBytes = new Uint8Array(pngBin.length);
+        for (let i = 0; i < pngBin.length; i++) pngBytes[i] = pngBin.charCodeAt(i);
+        embeddedImg = await pdfDoc.embedPng(pngBytes);
+      }
+    } catch (e) {
+      // Fallback: try jpg embed
+      embeddedImg = await pdfDoc.embedJpg(imgBytes);
+    }
+
+    const heightPct = parseInt(document.getElementById('heightRange').value) / 100;
+    const margin    = parseInt(document.getElementById('marginRange').value);
+    const addWm     = document.getElementById('wmToggle').checked;
+    const wmTxt     = document.getElementById('wmText').value.trim().toUpperCase() || 'CONFIDENTIAL';
+
+    setProgress(55, 'Stamping pages…');
+
+    const perPage = 30 / pages.length;
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const { width, height } = page.getSize();
+      const bannerH = height * heightPct;
+      const { width: imgW, height: imgH } = embeddedImg;
+      const aspectRatio = imgW / imgH;
+
+      if (selectedTmpl === 'fullbleed') {
+        // White background then full-width banner
+        page.drawRectangle({ x: 0, y: height - bannerH, width, height: bannerH, color: rgb(1,1,1) });
+        page.drawImage(embeddedImg, { x: 0, y: height - bannerH, width, height: bannerH });
+
+      } else if (selectedTmpl === 'centered') {
+        const drawH = bannerH - margin * 2;
+        const drawW = Math.min(drawH * aspectRatio, width - margin * 4);
+        const drawX = (width - drawW) / 2;
+        // Grey bar background
+        page.drawRectangle({ x: 0, y: height - bannerH, width, height: bannerH, color: rgb(0.97,0.97,0.97) });
+        // Separator line
+        page.drawLine({ start:{x:0,y:height-bannerH}, end:{x:width,y:height-bannerH}, thickness:0.5, color:rgb(0.82,0.82,0.82) });
+        page.drawImage(embeddedImg, { x: drawX, y: height - bannerH + margin, width: drawW, height: drawH });
+
+      } else {
+        // Standard: white bg, margin, proportional fit
+        const drawW = width - margin * 2;
+        const drawH = Math.min(bannerH - margin, drawW / aspectRatio);
+        page.drawRectangle({ x: 0, y: height - bannerH - margin, width, height: bannerH + margin, color: rgb(1,1,1) });
+        page.drawLine({ start:{x:margin,y:height-bannerH-margin}, end:{x:width-margin,y:height-bannerH-margin}, thickness:0.5, color:rgb(0.85,0.85,0.85) });
+        page.drawImage(embeddedImg, { x: margin, y: height - drawH - margin, width: drawW, height: drawH });
+      }
+
+      // Optional watermark
+      if (addWm) {
+        try {
+          page.drawText(wmTxt, {
+            x: width * 0.12, y: height * 0.38, size: 48,
+            color: rgb(0.82, 0.82, 0.82), opacity: 0.22,
+            rotate: { type: 'degrees', angle: 45 }
+          });
+        } catch(e) { /* skip if font issue */ }
+      }
+
+      setProgress(55 + (i+1) * perPage, `Branded page ${i+1} of ${pages.length}…`);
+    }
+
+    setProgress(88, 'Saving document…');
+    const outBytes = await pdfDoc.save({ useObjectStreams: false });
+
+    setProgress(100, 'Done!');
+    await new Promise(r => setTimeout(r, 400));
+
+    // Create blob and show result
+    outputBlob = new Blob([outBytes], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(outputBlob);
+
+    document.getElementById('statPages').textContent = pages.length;
+    document.getElementById('pdfPreviewFrame').src = blobUrl;
+    document.getElementById('downloadBtn').onclick = () => {
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'branded_ticket.pdf';
+      a.click();
+    };
+
+    document.getElementById('resultSection').style.display = 'block';
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    toast(`✅ Done! ${pages.length} page${pages.length>1?'s':''} branded successfully.`, 'ok');
+
+  } catch (err) {
+    toast('❌ ' + (err.message || 'Processing failed. Please try again.'), 'err');
+    console.error(err);
+  } finally {
+    overlay.classList.remove('show');
+  }
+}
+</script>
+</body>
+</html>
