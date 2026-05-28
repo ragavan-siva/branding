@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AirStamp — Ticket Branding</title>
+<title>SR Groups — Ticket Branding</title>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -26,8 +27,8 @@
   --warn: #f59e0b;
   --danger: #ef4444;
   --r: 14px; --r2: 10px;
-  --ff: 'DM Sans', sans-serif;
-  --fd: 'Syne', sans-serif;
+  --ff: 'Poppins', sans-serif;
+  --fd: 'Poppins', sans-serif;
 }
 html { scroll-behavior: smooth; }
 body {
@@ -264,7 +265,7 @@ footer { border-top: 1px solid var(--border); padding: 28px; text-align: center;
   <div class="logo">
     <div class="logo-icon">✈</div>
     <div>
-      <div class="logo-text">Air<span>Stamp</span></div>
+      <div class="logo-text"><span>SR </span>Groups</div>
       <div class="logo-sub">TICKET BRANDING</div>
     </div>
   </div>
@@ -289,16 +290,7 @@ footer { border-top: 1px solid var(--border); padding: 28px; text-align: center;
 <main>
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-pill">✦ Professional Ticket Branding</div>
-    <h1>Brand Your Tickets<br><span>Instantly — No Install</span></h1>
-    <p>Upload any airline PDF ticket, add your agency banner, and download a professionally branded ticket in seconds. Everything runs in your browser.</p>
-    <div class="hero-tags">
-      <span class="hero-tag">✈ Multi-page PDFs</span>
-      <span class="hero-tag">⚡ Instant in browser</span>
-      <span class="hero-tag">🎨 3 banner styles</span>
-      <span class="hero-tag">📱 Works on mobile</span>
-      <span class="hero-tag">🔒 Files never leave device</span>
-    </div>
+     <h1>Brand Your Tickets<br><span>Instantly — No Install</span></h1>
   </div>
 
   <!-- STEP 1: UPLOAD -->
@@ -449,7 +441,7 @@ footer { border-top: 1px solid var(--border); padding: 28px; text-align: center;
   </div>
 </main>
 
-<footer>✈ AirStamp — Everything runs in your browser. Your files never leave your device. ❤️</footer>
+<footer>✈ SR Groups — Everything runs in your browser. Your files never leave your device. ❤️</footer>
 
 <script>
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -457,9 +449,15 @@ let pdfBytes = null, bannerDataUrl = null, selectedTmpl = 'standard', outputBlob
 
 // ─── Dark/Light Mode ─────────────────────────────────────────────────────────
 const modeBtn = document.getElementById('modeBtn');
-let isDark = true;
+
+let isDark = false; // default light mode
+
+document.body.classList.add('light');
+modeBtn.textContent = '☀️';
+
 modeBtn.onclick = () => {
   isDark = !isDark;
+
   document.body.classList.toggle('light', !isDark);
   modeBtn.textContent = isDark ? '🌙' : '☀️';
 };
